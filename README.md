@@ -5,12 +5,17 @@ A modern web application for interacting with the Stellar blockchain, built with
 ## 🚀 Features
 
 ### Wallet Integration
+<img width="1008" height="747" alt="Screenshot from 2026-02-19 15-32-49" src="https://github.com/user-attachments/assets/e0c96bc7-6d32-41b2-9689-b5d2c67aaa17" />
+
 - **Connect Wallet**: Connect to Stellar wallets using Stellar Wallets Kit
 - **Support for Freighter**: Seamless integration with Freighter wallet
 - **Address Display**: Shows connected wallet address with copy functionality
 - **Connection Status**: Visual indicators for connection state
 
 ### Balance Management
+<img width="475" height="368" alt="Screenshot from 2026-02-19 15-35-00" src="https://github.com/user-attachments/assets/44483aab-6121-4fa9-b5ce-70c55feb722f" />
+
+
 - **Real-time Balance**: Display XLM balance with automatic updates
 - **Manual Refresh**: Refresh button to update balance manually
 - **Error Handling**: Graceful error display for balance fetch failures

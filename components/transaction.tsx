@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { stellar } from "@/lib/stellar-helper";
+import { motion } from "motion/react";
 import {
-  FaPaperPlane,
-  FaCheckCircle,
-  FaExclamationTriangle,
-  FaExternalLinkAlt,
-  FaCopy,
-} from "react-icons/fa";
+  CheckCircle,
+  AlertTriangle,
+  ExternalLink,
+  Copy,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { stellar } from "@/lib/stellar-helper";
+import { BiPaperPlane } from "react-icons/bi";
 
 interface TransactionProps {
   publicKey: string;
@@ -119,157 +122,176 @@ export default function TransactionComponent({
   };
 
   return (
-    <div className="border border-white/10 rounded-lg p-6 bg-white/5 space-y-4">
-      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-        <FaPaperPlane className="text-blue-400" />
-        Send XLM
-      </h3>
-
-      {transactionState.status === "idle" && (
-        <>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-white/60 text-sm mb-2">
-                Recipient Address
-              </label>
-              <input
-                type="text"
-                value={recipientAddress}
-                onChange={(e) => setRecipientAddress(e.target.value)}
-                placeholder="G..."
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white/60 text-sm mb-2">
-                Amount (XLM)
-              </label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.0"
-                step="0.0000001"
-                min="0.0000001"
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-white/60 text-sm mb-2">
-                Memo (Optional)
-              </label>
-              <input
-                type="text"
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-                placeholder="Transaction memo..."
-                maxLength={28}
-                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-400 focus:bg-white/15 transition-all"
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleSendTransaction}
-            disabled={!recipientAddress || !amount || !publicKey}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
-          >
-            <FaPaperPlane />
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BiPaperPlane className="h-5 w-5 text-primary" />
             Send XLM
-          </button>
-        </>
-      )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {transactionState.status === "idle" && (
+            <>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Recipient Address
+                  </label>
+                  <input
+                    type="text"
+                    value={recipientAddress}
+                    onChange={(e) => setRecipientAddress(e.target.value)}
+                    placeholder="G..."
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-all"
+                  />
+                </div>
 
-      {transactionState.status === "sending" && (
-        <div className="flex flex-col items-center justify-center py-8 space-y-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-solid border-blue-400 border-r-transparent"></div>
-          <p className="text-white/80">Sending transaction...</p>
-          <p className="text-white/60 text-sm">Please confirm in your wallet</p>
-        </div>
-      )}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Amount (XLM)
+                  </label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.0"
+                    step="0.0000001"
+                    min="0.0000001"
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-all"
+                  />
+                </div>
 
-      {transactionState.status === "success" && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 text-green-400">
-            <FaCheckCircle className="text-xl" />
-            <span className="font-medium">Transaction Successful!</span>
-          </div>
-
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 space-y-3">
-            <div>
-              <p className="text-white/60 text-sm mb-1">Transaction Hash</p>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-white font-mono text-sm break-all">
-                  {transactionState.hash}
-                </p>
-                <div className="flex gap-2 shrink-0">
-                  <button
-                    onClick={handleCopyHash}
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                    title={copied ? "Copied!" : "Copy hash"}
-                  >
-                    {copied ? (
-                      <FaCheckCircle className="text-green-400" />
-                    ) : (
-                      <FaCopy />
-                    )}
-                  </button>
-                  <a
-                    href={getExplorerLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                    title="View on explorer"
-                  >
-                    <FaExternalLinkAlt />
-                  </a>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Memo (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={memo}
+                    onChange={(e) => setMemo(e.target.value)}
+                    placeholder="Transaction memo..."
+                    maxLength={28}
+                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-all"
+                  />
                 </div>
               </div>
+
+              <Button
+                onClick={handleSendTransaction}
+                disabled={!recipientAddress || !amount || !publicKey}
+                className="w-full flex items-center gap-2"
+              >
+                <BiPaperPlane className="h-4 w-4" />
+                Send XLM
+              </Button>
+            </>
+          )}
+
+          {transactionState.status === "sending" && (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="h-8 w-8 border-2 border-primary border-r-transparent rounded-full"
+              />
+              <p className="text-foreground">Sending transaction...</p>
+              <p className="text-muted-foreground text-sm">
+                Please confirm in your wallet
+              </p>
             </div>
+          )}
 
-            <div className="text-green-400 text-sm">
-              {transactionState.message}
+          {transactionState.status === "success" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 text-green-600 dark:text-green-400">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">Transaction Successful!</span>
+              </div>
+
+              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-4 space-y-3">
+                <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
+                  Transaction Hash
+                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-mono text-green-900 dark:text-green-100 break-all">
+                    {transactionState.hash}
+                  </p>
+                  <div className="flex gap-2 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyHash}
+                      className="h-8 w-8"
+                      title={copied ? "Copied!" : "Copy hash"}
+                    >
+                      {copied ? (
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="h-8 w-8"
+                      title="View on explorer"
+                    >
+                      <a
+                        href={getExplorerLink()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-green-700 dark:text-green-300 text-sm">
+                {transactionState.message}
+              </div>
+
+              <Button variant="outline" onClick={resetForm} className="w-full">
+                Send Another Transaction
+              </Button>
             </div>
-          </div>
+          )}
 
-          <button
-            onClick={resetForm}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-all"
-          >
-            Send Another Transaction
-          </button>
-        </div>
-      )}
+          {transactionState.status === "error" && (
+            <>
+              <div className="flex items-center gap-3 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+                <span className="font-medium">Transaction Failed</span>
+              </div>
 
-      {transactionState.status === "error" && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 text-red-400">
-            <FaExclamationTriangle className="text-xl" />
-            <span className="font-medium">Transaction Failed</span>
-          </div>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+                <p className="text-destructive text-sm">
+                  {transactionState.error}
+                </p>
+              </div>
 
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-            <p className="text-red-400 text-sm">{transactionState.error}</p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={resetForm}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-all"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={handleSendTransaction}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={resetForm}
+                  className="flex-1"
+                >
+                  Try Again
+                </Button>
+                <Button onClick={handleSendTransaction} className="flex-1">
+                  Retry
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
